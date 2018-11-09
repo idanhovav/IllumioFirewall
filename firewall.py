@@ -31,6 +31,8 @@ class Firewall:
 
 	def accept_packet(self, direction, protocolName, portNumber, IPAddressString):
 		protocolRules = self.getProtocolRules(direction, protocolName)
+		if protocolRules == None:
+			return False
 		return protocolRules.isValidPacket(portNumber, IPAddressString)
 
 	def addProtocol(self, protocolRulesByName, protocolName):
@@ -39,7 +41,8 @@ class Firewall:
 
 	def getProtocolRules(self, direction, protocolName):
 		protocolRulesByName = self.protocolRulesByDirection[direction]
-
+		if protocolName not in protocolRulesByName:
+			return None
 		return protocolRulesByName[protocolName]
 
 
