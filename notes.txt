@@ -1,1 +1,5 @@
 started at 2pm
+
+assuming file with rules has no headers
+
+# TODO change portString to portNumber in isValidPacket
