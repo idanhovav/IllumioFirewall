@@ -1,26 +1,47 @@
-
 class Firewall:
+
+	allowedDirections = ["inbound", "outbound"]
 
 	def __init__(self, rulesFileName):
 		self.rulesFileName = rulesFileName
-		self.inboundProtocolDict = {}
-		self.inboundProtocolDict = {}
+		self.protocolRulesByDirection = {} # direction -> protocol names -> ProtocolRules
+
+		for direction in Firewall.allowedDirections:
+			self.protocolRulesByDirection[direction] = {}
+
+		self.processRulesFile()
+		# Future optimization: merge IP Address intervals per port per protocol
+
 
 	def processRulesFile(self):
+		with open(self.rulesFileName) as rulesFile:
+			for line in rulesFile:
+				(directionString, protocolName, portString, IPAddressString) = self.parseRuleString(line)
+				protocolRulesByName = self.protocolRulesByDirection[directionString]
+				if protocolName not in protocolRulesByName:
+					self.addProtocol(protocolRulesByName, protocolName)
+				protocolRules = protocolRulesByName[protocolName]
+				protocolRules.addRule(portString, IPAddressString)
+
 		return
 
-	def accept_packet(self, directionString, protocolNameString, portNumber, IPAddressString):
+	def parseRuleString(self, ruleString):
 
-		return False
+		return ruleString.split(",")
 
-	def addProtocol(self, directionDict, protocolName):
-		return
+	def accept_packet(self, direction, protocolName, portNumber, IPAddressString):
+		protocolRules = getProtocolRules(direction, protocolName)
 
-	def addToProtocolRules(self, protocol,  portIntervalString, IPIntervalString):
-		return
+		return protocolRules.isValidPacket(portNumber, IPAddressString)
+
+	def addProtocol(self, protocolRulesByName, protocolName):
+
+		protocolRulesByName[protocolName] = ProtocolRules(protocolName)
 
 	def getProtocolRules(self, direction, protocolName):
-		return
+		protocolRulesByName = self.protocolRulesByDirection[direction]
+
+		return protocolRulesByName[protocolName]
 
 
 class ProtocolRules:
