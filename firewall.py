@@ -30,7 +30,7 @@ class Firewall:
 		return ruleString.split(",")
 
 	def accept_packet(self, direction, protocolName, portNumber, IPAddressString):
-		protocolRules = getProtocolRules(direction, protocolName)
+		protocolRules = self.getProtocolRules(direction, protocolName)
 
 		return protocolRules.isValidPacket(portNumber, IPAddressString)
 
@@ -48,12 +48,31 @@ class ProtocolRules:
 
 	def __init__(self, protocolName):
 		self.protocolName = protocolName
-		self.rules = {}
+		self.rules = {} # portNumber -> IPInterval
 
 	def addRule(self, portIntervalString, IPIntervalString):
+		portInterval = PortInterval(portIntervalString)
+		newIPInterval = IPInterval(IPIntervalString)
+
+		for port in portInterval.getIterable():
+			self.addIPIntervalToPort(port, newIPInterval)
+
 		return
 
-	def isValidPacket(self, portString, IPString):
+	def isValidPacket(self, portNumber, IPString):
+		if portNumber not in self.rules:
+			return False
+
+		allowedIPIntervals = self.rules[portNumber]
+
+		return any([IPInterval.contains(IPString) for IPInterval in allowedIPIntervals])
+
+	def addIPIntervalToPort(self, port, IPInterval):
+		if port not in self.rules:
+			self.rules[port] = [IPInterval]
+		else:
+			self.rules[port].append(IPInterval)
+
 		return
 
 
@@ -68,7 +87,10 @@ class PortInterval:
 		return
 
 	def portStringToInterval(self, portString):
-		return
+		return (0, 0)
+
+	def getIterable(self):
+		return range(self.lowerLimit, self.upperLimit + 1) # + 1 to make inclusive
 
 
 class IPInterval:
@@ -82,7 +104,7 @@ class IPInterval:
 		return
 
 	def IPStringToInterval(self, IPString):
-		return
+		return (0, 0)
 
 	def parseIPString(self, IPString):
 		return
