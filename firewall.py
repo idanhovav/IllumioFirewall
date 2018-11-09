@@ -26,12 +26,11 @@ class Firewall:
 		return
 
 	def parseRuleString(self, ruleString):
-
+		ruleString = ruleString.rsplit()[0]
 		return ruleString.split(",")
 
 	def accept_packet(self, direction, protocolName, portNumber, IPAddressString):
 		protocolRules = self.getProtocolRules(direction, protocolName)
-
 		return protocolRules.isValidPacket(portNumber, IPAddressString)
 
 	def addProtocol(self, protocolRulesByName, protocolName):
@@ -64,7 +63,6 @@ class ProtocolRules:
 			return False
 
 		allowedIPIntervals = self.rules[portNumber]
-
 		return any([IPInterval.contains(IPString) for IPInterval in allowedIPIntervals])
 
 	def addIPIntervalToPort(self, port, IPInterval):
