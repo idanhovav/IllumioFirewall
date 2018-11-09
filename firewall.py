@@ -83,14 +83,25 @@ class PortInterval:
 		self.lowerLimit = lowerLimit
 		self.upperLimit = upperLimit
 
-	def contains(self, portString):
-		return
+	def contains(self, portNumber):
+		return (self.lowerLimit <= portNumber and portNumber <= self.upperLimit)
 
 	def portStringToInterval(self, portString):
-		return (0, 0)
+		(lowerLimitString, upperLimitString) = ("", "")
+
+		if self.isPortRange(portString):
+			(lowerLimitString, upperLimitString) = portString.split("-")
+		else:
+			(lowerLimitString, upperLimitString) = (portString, portString)
+
+		return (int(lowerLimitString), int(upperLimitString))
 
 	def getIterable(self):
 		return range(self.lowerLimit, self.upperLimit + 1) # + 1 to make inclusive
+
+	def isPortRange(self, portString):
+
+		return "-" in portString
 
 
 class IPInterval:
