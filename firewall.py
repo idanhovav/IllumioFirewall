@@ -112,10 +112,15 @@ class IPInterval:
 		self.upperLimit = upperLimit
 
 	def contains(self, IPString):
+		# Since these are strings, comparison should be lexicographically.
+		# TODO: check this is true
+		return (self.lowerLimit <= IPString and IPString <= self.upperLimit)
 		return
 
 	def IPStringToInterval(self, IPString):
-		return (0, 0)
 
-	def parseIPString(self, IPString):
-		return
+		return IPString.split("-") if self.isIPRange(IPString) else (IPString, IPString)
+
+	def isIPRange(self, IPString):
+
+		return "-" in IPString
